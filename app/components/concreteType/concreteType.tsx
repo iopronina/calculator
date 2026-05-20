@@ -28,6 +28,7 @@ const TabButton = (props: TabButtonTypes) => (
 
 interface ConcreteTypeProps {
     settings: SettingsType;
+    userName?: string;
 }
 
 type EditableRow = {
@@ -109,7 +110,13 @@ const ConcreteType = (props: ConcreteTypeProps) => {
     }, [isDirty]);
 
     const handleChangeGeneral = (
-        patch: Partial<{ rate: number; overheads: number; profit: number }>,
+        patch: Partial<{
+            rate: number;
+            overheads: number;
+            profit: number;
+            organizationName: string;
+            organizationInfo: string;
+        }>,
     ) => {
         if (saveMessage) {
             setSaveMessage('');
@@ -196,6 +203,10 @@ const ConcreteType = (props: ConcreteTypeProps) => {
                     rate: Number(draftSettings.general.rate),
                     overheads: Number(draftSettings.general.overheads),
                     profit: Number(draftSettings.general.profit),
+                    organizationName:
+                        draftSettings.general.organizationName ?? '',
+                    organizationInfo:
+                        draftSettings.general.organizationInfo ?? '',
                 },
                 pay: buildSectionPayload(savedSettings.pay, draftSettings.pay),
                 materials: buildSectionPayload(
@@ -295,6 +306,7 @@ const ConcreteType = (props: ConcreteTypeProps) => {
             {activeTab === 'general' && (
                 <GeneralTable
                     settings={draftSettings}
+                    userName={props.userName}
                     onChange={handleChangeGeneral}
                 />
             )}

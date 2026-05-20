@@ -7,6 +7,7 @@ import { TABS } from './tabs.data';
 
 interface ChoiceTypeProps {
     settings: SettingsType;
+    userName?: string;
 }
 
 const ChoiceType = (props: ChoiceTypeProps) => {
@@ -36,7 +37,10 @@ const ChoiceType = (props: ChoiceTypeProps) => {
                     ))}
                 </div>
                 {activeTab === 'concrete' && (
-                    <ConcreteType settings={props.settings} />
+                    <ConcreteType
+                        settings={props.settings}
+                        userName={props.userName}
+                    />
                 )}
                 {activeTab === 'polymer' && <></>}
             </div>

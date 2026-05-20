@@ -15,7 +15,13 @@ export interface FormulaSettings {
 }
 
 export interface SettingsType {
-    general: { rate: number; overheads: number; profit: number };
+    general: {
+        rate: number;
+        overheads: number;
+        profit: number;
+        organizationName?: string;
+        organizationInfo?: string;
+    };
     exp: Array<{ id: string; name: string; price: number; increase: number }>;
     pay: Array<{ id: string; name: string; price: number; increase: number }>;
     materials: Array<{

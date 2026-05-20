@@ -4,12 +4,28 @@ import { getDb } from '@/app/utils/api-routes';
 import { Db, Document } from 'mongodb';
 import { SettingsType } from '@/app/models/adminDataTypes';
 
+const ORG_NAME_MAX_LENGTH = 200;
+const ORG_INFO_MAX_LENGTH = 1000;
+
 const DEFAULT_SETTINGS: SettingsType = {
-    general: { rate: 0, overheads: 0, profit: 0 },
+    general: {
+        rate: 0,
+        overheads: 0,
+        profit: 0,
+        organizationName: '',
+        organizationInfo: '',
+    },
     pay: [],
     materials: [],
     exp: [],
     version: 0,
+};
+
+const toTrimmedString = (value: unknown, maxLength: number): string => {
+    if (typeof value !== 'string') {
+        return '';
+    }
+    return value.trim().slice(0, maxLength);
 };
 
 type PriceRow = { id: string; name: string; price: number; increase: number };
@@ -121,11 +137,12 @@ export async function PUT(req: Request) {
                       rate?: number;
                       overheads?: number;
                       profit?: number;
+                      organizationName?: string;
+                      organizationInfo?: string;
                   })
                 : DEFAULT_SETTINGS.general;
 
         const toSave: SettingsType = {
-            // In general we only allow changing numeric values.
             general: {
                 rate: toNumberOrFallback(payload.general?.rate, currentGeneral.rate ?? 0),
                 overheads: toNumberOrFallback(
@@ -135,6 +152,14 @@ export async function PUT(req: Request) {
                 profit: toNumberOrFallback(
                     payload.general?.profit,
                     currentGeneral.profit ?? 0,
+                ),
+                organizationName: toTrimmedString(
+                    payload.general?.organizationName,
+                    ORG_NAME_MAX_LENGTH,
+                ),
+                organizationInfo: toTrimmedString(
+                    payload.general?.organizationInfo,
+                    ORG_INFO_MAX_LENGTH,
                 ),
             },
             // For tariff sections only numeric fields are mutable.
@@ -189,7 +214,19 @@ const getSettings = async (db: Db): Promise<SettingsType | null> => {
         typeof doc.general.rate === 'number' &&
         typeof doc.general.overheads === 'number' &&
         typeof doc.general.profit === 'number'
-            ? doc.general
+            ? {
+                  rate: doc.general.rate,
+                  overheads: doc.general.overheads,
+                  profit: doc.general.profit,
+                  organizationName:
+                      typeof doc.general.organizationName === 'string'
+                          ? doc.general.organizationName
+                          : '',
+                  organizationInfo:
+                      typeof doc.general.organizationInfo === 'string'
+                          ? doc.general.organizationInfo
+                          : '',
+              }
             : DEFAULT_SETTINGS.general;
 
     return {

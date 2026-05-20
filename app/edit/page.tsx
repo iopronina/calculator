@@ -4,6 +4,7 @@ import { SettingsType } from '@/app/models/adminDataTypes';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import { singOutFunc } from '../actions/auth-actions';
+import { auth } from '@/app/auth';
 
 const DEFAULT_SETTINGS: SettingsType = {
     general: { rate: 0, overheads: 0, profit: 0 },
@@ -58,7 +59,11 @@ async function fetchSettings() {
 }
 
 async function EditPage() {
-    const { settings, warning } = await fetchSettings();
+    const [{ settings, warning }, session] = await Promise.all([
+        fetchSettings(),
+        auth(),
+    ]);
+    const userName = session?.user?.name ?? '';
 
     return (
         <>
@@ -81,7 +86,9 @@ async function EditPage() {
                     {warning}
                 </div>
             ) : null}
-            {settings ? <ChoiceType settings={settings} /> : null}
+            {settings ? (
+                <ChoiceType settings={settings} userName={userName} />
+            ) : null}
         </>
     );
 }

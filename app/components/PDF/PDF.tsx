@@ -40,6 +40,8 @@ interface PDFProps {
     orderInfo?: Required<CalculateRequest>;
     calcNumber?: string;
     calcDate?: string;
+    organizationName?: string;
+    organizationInfo?: string;
 }
 
 const tableColumns = [
@@ -381,6 +383,36 @@ const styles = StyleSheet.create({
     },
 });
 
+const DefaultOrganizationBlock = () => (
+    <>
+        <Text style={styles.companyInfo}>
+            Телефон:{' '}
+            <Link
+                href='tel:+79202520001'
+                style={{
+                    color: '#54b0bf',
+                    textDecoration: 'none',
+                }}>
+                +79202520001
+            </Link>
+        </Text>
+        <Text style={styles.companyInfo}>
+            Email:{' '}
+            <Link
+                href='mailto:office@profix-nn.ru'
+                style={{
+                    color: '#54b0bf',
+                    textDecoration: 'none',
+                }}>
+                office@profix-nn.ru
+            </Link>
+        </Text>
+        <Text style={styles.companyDetails}>
+            ИНН 5258123969 КПП 525801001 ОГРН 1155258004648
+        </Text>
+    </>
+);
+
 const PDF = ({
     description,
     title,
@@ -390,7 +422,17 @@ const PDF = ({
     orderInfo,
     calcNumber,
     calcDate,
-}: PDFProps) => (
+    organizationName,
+    organizationInfo,
+}: PDFProps) => {
+    const trimmedName = organizationName?.trim() ?? '';
+    const trimmedInfo = organizationInfo?.trim() ?? '';
+    const displayName = trimmedName || 'ООО "ПРОФИКС НН"';
+    const infoLines = trimmedInfo
+        ? trimmedInfo.split('\n').map((line) => line.trim()).filter(Boolean)
+        : [];
+
+    return (
     <Document language='ru' title='Предварительная смета ПРОФИКС НН'>
         <Page size='A4' style={styles.page}>
             <View style={styles.header}>
@@ -398,32 +440,18 @@ const PDF = ({
                     <Logo />
                     <View style={{ flex: 1, marginLeft: 10 }}>
                         <Text style={styles.headerSectionTitle}></Text>
-                        <Text style={styles.companyName}>ООО "ПРОФИКС НН"</Text>
-                        <Text style={styles.companyInfo}>
-                            Телефон:{' '}
-                            <Link
-                                href='tel:+79202520001'
-                                style={{
-                                    color: '#54b0bf',
-                                    textDecoration: 'none',
-                                }}>
-                                +79202520001
-                            </Link>
-                        </Text>
-                        <Text style={styles.companyInfo}>
-                            Email:{' '}
-                            <Link
-                                href='mailto:office@profix-nn.ru'
-                                style={{
-                                    color: '#54b0bf',
-                                    textDecoration: 'none',
-                                }}>
-                                office@profix-nn.ru
-                            </Link>
-                        </Text>
-                        <Text style={styles.companyDetails}>
-                            ИНН 5258123969 КПП 525801001 ОГРН 1155258004648
-                        </Text>
+                        <Text style={styles.companyName}>{displayName}</Text>
+                        {infoLines.length > 0 ? (
+                            infoLines.map((line, index) => (
+                                <Text
+                                    key={`org-info-${index}`}
+                                    style={styles.companyInfo}>
+                                    {line}
+                                </Text>
+                            ))
+                        ) : (
+                            <DefaultOrganizationBlock />
+                        )}
                     </View>
                 </View>
                 <View style={styles.headerRight}>
@@ -600,6 +628,7 @@ const PDF = ({
             )}
         </Page>
     </Document>
-);
+    );
+};
 
 export default PDF;

@@ -141,7 +141,10 @@ const PreOffer = ({
     pump,
     thickness,
     preparation,
+    settings,
 }: PreOfferProps) => {
+    const organizationName = settings?.[0]?.general?.organizationName ?? '';
+    const organizationInfo = settings?.[0]?.general?.organizationInfo ?? '';
     const [isLoading, setIsLoading] = React.useState(true);
     const [isPdfLoading, setIsPdfLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
@@ -472,6 +475,8 @@ const PreOffer = ({
                             orderInfo={result.normalizedInput}
                             calcNumber={calcMeta.number}
                             calcDate={calcMeta.date}
+                            organizationName={organizationName}
+                            organizationInfo={organizationInfo}
                         />
                     }
                     fileName={`raschet_${calcMeta.fileDate}.pdf`}
